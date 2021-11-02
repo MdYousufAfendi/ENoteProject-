@@ -1,0 +1,66 @@
+package com.servlet;
+
+import javax.jws.WebService;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.entity.User;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.servlet.http.Part;
+
+
+import com.DB.DBConnect;
+import com.dao.JobDAO;
+import com.entity.Jobs;
+
+@WebServlet("/add_job")
+public class AddPostServlet extends HttpServlet {
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		try {
+			
+			String title=req.getParameter("title");
+			String location=req.getParameter("location");
+			String category=req.getParameter("category");
+			String status=req.getParameter("status");
+			String desc=req.getParameter("desc");
+			
+			Jobs j=new Jobs();
+			j.setTitle(title);
+			j.setDescription(desc);
+			j.setLocation(location);
+			j.setStatus(status);
+			j.setCategory(category);
+			
+			HttpSession session=req.getSession();
+			
+			JobDAO dao=new JobDAO(DBConnect.getConn());
+			boolean f=dao.addJob(j);
+			if(f)
+			{
+				session.setAttribute1("succMsg", "Job Post Successfully");
+				resp.sendRedirect("add_job.jsp");
+			}
+			else {
+				session.setAttribute1("succMsg", "Something wrong on server");
+				resp.sendRedirect("add_job.jsp");
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	
+}
